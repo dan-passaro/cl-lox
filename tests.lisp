@@ -28,4 +28,8 @@
   (let ((result (run-and-capture "print \"Hello\";")))
     (is (string= (format nil "Hello~%")
 		 (stdout result)))
+    (is (string= "" (stderr result))))
+  (let ((result (run-and-capture "print \"Howdy\";")))
+    (is (string= (format nil "Howdy~%")
+		 (stdout result)))
     (is (string= "" (stderr result)))))
