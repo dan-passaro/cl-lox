@@ -17,12 +17,15 @@
     (setf (stderr result) stderr)
     result))
 
-(defun run-and-capture (lox-source)
+(defun capture-result (func &rest args)
   (let ((*standard-output* (make-string-output-stream))
 	(*error-output* (make-string-output-stream)))
-    (cl-lox:run lox-source)
+    (apply func args)
     (lox-result (get-output-stream-string *standard-output*)
 		(get-output-stream-string *error-output*))))
+
+(defun run-and-capture (lox-source)
+  (capture-result 'cl-lox:run lox-source))
 
 (test print-statement
   (let ((result (run-and-capture "print \"Hello\";")))
@@ -33,3 +36,20 @@
     (is (string= (format nil "Howdy~%")
 		 (stdout result)))
     (is (string= "" (stderr result)))))
+
+(test run-file
+  (uiop:with-temporary-file (:stream fstream :pathname path)
+    (format fstream "print \"Hello from file\";~%")
+    (finish-output fstream)
+    (let ((result (capture-result 'cl-lox:run-file path)))
+      (is (string= (format nil "Hello from file~%")
+		   (stdout result)))
+      (is (string= "" (stderr result))))))
+
+(test run-prompt
+  (with-input-from-string (*standard-input*
+			   (format nil "print \"I'm in a prompt\";~%"))
+    (let ((result (capture-result 'cl-lox:run-prompt)))
+      (is (string= (format nil "> I'm in a prompt~%> ")
+		   (stdout result)))
+      (is (string= "" (stderr result))))))
