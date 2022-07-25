@@ -67,7 +67,14 @@
 	     (identifier ()
 	       (loop while (is-alphanumeric? (peek))
 		     do (advance))
-	       (add-token 'cl-lox/tokens:identifier))
+
+	       (let* ((text (subseq source start current))
+		      (typepair (assoc text cl-lox/tokens:keywords
+				       :test 'equals))
+		      (type (if typepair (cdr typepair)
+				'cl-lox/tokens:identifier)))
+
+		 (add-token type)))
 
 	     (scan-token ()
 	       (let ((c (advance)))

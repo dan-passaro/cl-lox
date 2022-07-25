@@ -74,3 +74,9 @@
 		    (make-token 'cl-lox/tokens:plus "+" nil 1)
 		    (make-token 'cl-lox/tokens:identifier "num100" nil 1))
 	      (cl-lox/scan:scan-tokens "_myVar + num100"))))
+
+(test scans-keywords
+  (is (equals (list (make-token 'cl-lox/tokens:class "class" nil 1))
+	      (cl-lox/scan:scan-tokens "class")))
+  (is (equals (list (make-token 'cl-lox/tokens:false "false" nil 1))
+	      (cl-lox/scan:scan-tokens "false"))))

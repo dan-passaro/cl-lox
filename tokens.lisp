@@ -21,9 +21,26 @@
    :slash
    :string
    :number
-   :identifier)
+   :identifier
+   :class
+   :keywords
+   :and
+   :class
+   :else
+   :false
+   :for
+   :fun
+   :if
+   :nil
+   :or
+   :print
+   :return
+   :super
+   :this
+   :var
+   :while)
   (:use :cl)
-  (:shadow :equal :number :string))
+  (:shadow :and :if :nil :or :print :equal :number :string))
 (in-package :cl-lox/tokens)
 
 (defparameter left-paren "(")
@@ -48,3 +65,20 @@
 (defparameter string "STRING")
 (defparameter number "NUMBER")
 (defparameter identifier "IDENTIFIER")
+
+(defparameter keywords
+  '(("and" . and)
+    ("class" . class)
+    ("else" . else)
+    ("false" . false)
+    ("for" . for)
+    ("fun" . fun)
+    ("if" . if)
+    ("nil" . nil)
+    ("or" . or)
+    ("print" . print)
+    ("return" . return)
+    ("super" . super)
+    ("this" . this)
+    ("var" . var)
+    ("while" . while)))
