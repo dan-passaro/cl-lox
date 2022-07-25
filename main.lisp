@@ -1,7 +1,7 @@
 (defpackage :cl-lox/main
   (:nicknames :cl-lox)
   (:use :cl)
-  (:export :run :run-prompt :run-file))
+  (:export :main :run :run-prompt :run-file))
 (in-package :cl-lox/main)
 
 (defun run (code-str)
@@ -26,17 +26,21 @@
   "Start an interactive Lox shell."
   (block prompt-loop
     (loop
-      (princ "> ")
-      (let ((line (read-line *standard-input* nil)))
-	(when (not line) (return-from prompt-loop))
-	(run line)))))
+       (princ "> ")
+       (finish-output)
+
+       (let* ((line (read-line *standard-input* nil))
+	      (line-empty (or (not line) (string= line ""))))
+	 (when line-empty (return-from prompt-loop))
+	 (run line)))))
 
 (defun main ()
   "Toplevel entry point for a cl-lox binary."
   (let ((args (uiop:command-line-arguments)))
-    (when (> (length args) 1)
-      (println "Usage: cl-lox [script]")
-      (uiop:quit 64))
-    (when (= (length args) 1)
-      (run-file (first args)))
-    (run-prompt)))
+    (cond ((> (length args) 1)
+	   (println "Usage: cl-lox [script]")
+	   (uiop:quit 64))
+	  ((= (length args) 1)
+	   (run-file (first args)))
+	  (t
+	   (run-prompt)))))
