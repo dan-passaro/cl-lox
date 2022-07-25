@@ -1,6 +1,10 @@
 (defpackage :cl-lox/tests
   (:use :cl :fiveam)
   (:import-from :cl-lox)
+  (:import-from :cl-lox/equals :equals)
+  (:import-from :cl-lox/scan)
+  (:import-from :cl-lox/token :make-token)
+  (:import-from :cl-lox/tokens)
   (:export :cl-lox-tests))
 (in-package :cl-lox/tests)
 
@@ -53,3 +57,9 @@
       (is (string= (format nil "> I'm in a prompt~%> ")
 		   (stdout result)))
       (is (string= "" (stderr result))))))
+
+(test scans-numbers
+  (is (equals (list (make-token 'cl-lox/tokens:number "3" 3.0 1)
+		    (make-token 'cl-lox/tokens:plus "+" nil 1)
+		    (make-token 'cl-lox/tokens:number "4" 4.0 1))
+	      (cl-lox/scan:scan-tokens "3 + 4"))))
