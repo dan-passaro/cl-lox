@@ -1,7 +1,7 @@
 (defpackage :cl-lox/scan
   (:export :scan-tokens)
 
-  (:use :cl)
+  (:use :cl :cl-lox/equals)
   (:import-from :cl-lox/token :make-token)
   (:import-from :cl-lox/tokens))
 (in-package :cl-lox/scan)
@@ -58,6 +58,17 @@
 
 		 (add-token 'cl-lox/tokens:number (float value))))
 
+	     (is-alpha? (c)
+	       (or (alpha-char-p c) (equals c #\_)))
+
+	     (is-alphanumeric?  (c)
+	       (or (is-alpha? c) (digit-char-p c)))
+
+	     (identifier ()
+	       (loop while (is-alphanumeric? (peek))
+		     do (advance))
+	       (add-token 'cl-lox/tokens:identifier))
+
 	     (scan-token ()
 	       (let ((c (advance)))
 		 (case c
@@ -98,9 +109,12 @@
 		   (#\" (str))
 
 		   (t
-		    (if (digit-char-p c)
-			(number)
-			(error "Shouldn't get here; unrecognized character")))))))
+		    (cond ((digit-char-p c)
+			   (number))
+			  ((is-alpha? c)
+			   (identifier))
+			  (t
+			   (error "Shouldn't get here; unrecognized character"))))))))
       (loop until (is-at-end)
 	    do (setf start current)
 	       (scan-token)))
