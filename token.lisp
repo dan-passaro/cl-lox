@@ -1,6 +1,12 @@
 (defpackage :cl-lox/token
   (:use :cl :cl-lox/equals)
-  (:export :make-token :token))
+  (:export
+   :make-token
+   :token
+   :token-type
+   :lexeme
+   :literal
+   :line))
 (in-package :cl-lox/token)
 
 (defclass token ()
@@ -17,7 +23,7 @@
 			:line line))
 
 (defmethod print-object ((token token) stream)
-  (format stream "(make-token ~s ~s ~s ~s)"
+  (format stream "#.(cl-lox:make-token '~s ~s ~s ~s)"
 	  (token-type token)
 	  (lexeme token)
 	  (literal token)

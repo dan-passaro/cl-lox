@@ -1,7 +1,8 @@
 (defpackage :cl-lox/main
   (:nicknames :cl-lox)
   (:use :cl)
-  (:export :main :run :run-prompt :run-file))
+  (:import-from :cl-lox/token :make-token)
+  (:export :main :make-token :run :run-prompt :run-file))
 (in-package :cl-lox/main)
 
 (defun run (code-str)
