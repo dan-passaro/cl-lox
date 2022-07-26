@@ -16,7 +16,11 @@
    (line :reader line :initarg :line)))
 
 (defun make-token (token-type lexeme literal line)
+
+  ;; TODO: this should be a declaim or something so this is a compile
+  ;; time only check. But I don't know how to do that in CL yet :)
   (check-type token-type symbol)
+
   (make-instance 'token :token-type token-type
 			:lexeme lexeme
 			:literal literal
