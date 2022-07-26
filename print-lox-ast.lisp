@@ -11,19 +11,19 @@
   (format nil "(~a ~{~a~^ ~})" name (mapcar 'print-lox-ast exprs)))
 
 (defmethod print-lox-ast ((b binary))
-  (parenthesize (cl-lox/token:lexeme (operator b))
-		(left b)
-		(right b)))
+  (parenthesize (cl-lox/token:lexeme (binary-operator b))
+		(binary-left b)
+		(binary-right b)))
 
 (defmethod print-lox-ast ((g grouping))
-  (parenthesize "group" (expression g)))
+  (parenthesize "group" (grouping-expression g)))
 
 (defmethod print-lox-ast ((l literal))
-  (let ((val (value l)))
+  (let ((val (literal-value l)))
     (if (null val)
 	"nil"
 	(write-to-string val))))
 
 (defmethod print-lox-ast ((u unary))
-  (parenthesize (cl-lox/token:lexeme (operator u))
-		(right u)))
+  (parenthesize (cl-lox/token:lexeme (unary-operator u))
+		(unary-right u)))

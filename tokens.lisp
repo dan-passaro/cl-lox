@@ -37,8 +37,10 @@
    :return
    :super
    :this
+   :true
    :var
-   :while)
+   :while
+   :eof)
   (:use :cl)
   (:shadow :and :if :nil :or :print :equal :number :string))
 (in-package :cl-lox/tokens)
@@ -65,6 +67,7 @@
 (defparameter string "STRING")
 (defparameter number "NUMBER")
 (defparameter identifier "IDENTIFIER")
+(defparameter eof "EOF")
 
 (defparameter keywords
   '(("and" . and)
@@ -80,5 +83,6 @@
     ("return" . return)
     ("super" . super)
     ("this" . this)
+    ("true" . true)
     ("var" . var)
     ("while" . while)))

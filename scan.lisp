@@ -125,4 +125,5 @@
       (loop until (is-at-end)
 	    do (setf start current)
 	       (scan-token)))
+    (push (make-token 'cl-lox/tokens:eof "" nil line) tokens)
     (nreverse tokens)))

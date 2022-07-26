@@ -23,6 +23,8 @@
     (setf (stderr result) stderr)
     result))
 
+(defparameter *eof-token* (make-token 'cl-lox/tokens:eof "" nil 1))
+
 (defun capture-result (func &rest args)
   (let ((*standard-output* (make-string-output-stream))
 	(*error-output* (make-string-output-stream)))
@@ -63,22 +65,27 @@
 (test scans-numbers
   (is (equals (list (make-token 'cl-lox/tokens:number "3" 3.0 1)
 		    (make-token 'cl-lox/tokens:plus "+" nil 1)
-		    (make-token 'cl-lox/tokens:number "4" 4.0 1))
+		    (make-token 'cl-lox/tokens:number "4" 4.0 1)
+		    *eof-token*)
 	      (cl-lox/scan:scan-tokens "3 + 4"))))
 
 (test scans-identifiers
   (is (equals (list (make-token 'cl-lox/tokens:identifier "a" nil 1)
 		    (make-token 'cl-lox/tokens:plus "+" nil 1)
-		    (make-token 'cl-lox/tokens:identifier "b" nil 1))
+		    (make-token 'cl-lox/tokens:identifier "b" nil 1)
+		    *eof-token*)
 	      (cl-lox/scan:scan-tokens "a + b")))
 
   (is (equals (list (make-token 'cl-lox/tokens:identifier "_myVar" nil 1)
 		    (make-token 'cl-lox/tokens:plus "+" nil 1)
-		    (make-token 'cl-lox/tokens:identifier "num100" nil 1))
+		    (make-token 'cl-lox/tokens:identifier "num100" nil 1)
+		    *eof-token*)
 	      (cl-lox/scan:scan-tokens "_myVar + num100"))))
 
 (test scans-keywords
-  (is (equals (list (make-token 'cl-lox/tokens:class "class" nil 1))
+  (is (equals (list (make-token 'cl-lox/tokens:class "class" nil 1)
+		    *eof-token*)
 	      (cl-lox/scan:scan-tokens "class")))
-  (is (equals (list (make-token 'cl-lox/tokens:false "false" nil 1))
+  (is (equals (list (make-token 'cl-lox/tokens:false "false" nil 1)
+		    *eof-token*)
 	      (cl-lox/scan:scan-tokens "false"))))

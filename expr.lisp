@@ -2,65 +2,59 @@
   (:export
    :binary
    :make-binary
-   :left
-   :operator
-   :right
+   :binary-left
+   :binary-operator
+   :binary-right
    :grouping
    :make-grouping
-   :expression
+   :grouping-expression
    :literal
    :make-literal
-   :value
+   :literal-value
    :unary
-   :make-unary)
+   :make-unary
+   :unary-operator
+   :unary-right)
   (:use :cl)
   (:import-from :cl-lox/token :token))
 (in-package :cl-lox/expr)
 
-(defclass expr () ())
+(defstruct expr)
 
-(defclass binary (expr)
-  ((left :initarg :left :reader left)
-   (operator :initarg :operator :reader operator)
-   (right :initarg :right :reader right)))
-
-(defun make-binary (left operator right)
-  (make-instance 'binary :left left :operator operator :right right))
+(defstruct (binary (:include expr)
+		   (:constructor make-binary (left operator right)))
+  left
+  operator
+  right)
 
 (defmethod print-object ((b binary) s)
   (format s "#.(cl-lox/expr:make-binary ~s ~s ~s)"
-	  (left b)
-	  (operator b)
-	  (right b)))
+	  (binary-left b)
+	  (binary-operator b)
+	  (binary-right b)))
 
-(defclass grouping (expr)
-  ((expression :initarg :expression :reader expression)))
-
-(defun make-grouping (expression)
-  (make-instance 'grouping :expression expression))
+(defstruct (grouping (:include expr)
+		     (:constructor make-grouping (expression)))
+  expression)
 
 (defmethod print-object ((g grouping) s)
   (format s "#.(cl-lox/expr:make-grouping ~s)"
-	  (expression g)))
+	  (grouping-expression g)))
 
-(defclass literal (expr)
-  ((value :initarg :value :reader value)))
-
-(defun make-literal (value)
-  (make-instance 'literal :value value))
+(defstruct (literal (:include expr)
+		    (:constructor make-literal (value)))
+  value)
 
 (defmethod print-object ((l literal) s)
   (format s "#.(cl-lox/expr:make-literal ~s)"
-	  (value l)))
+	  (literal-value l)))
 
-(defclass unary (expr)
-  ((operator :initarg :operator :reader operator :type token)
-   (right :initarg :right :reader right :type expr)))
-
-(defun make-unary (operator right)
-  (make-instance 'unary :operator operator :right right))
+(defstruct (unary (:include expr)
+		  (:constructor make-unary (operator right)))
+  operator
+  right)
 
 (defmethod print-object ((u unary) s)
   (format s "#.(cl-lox/expr:make-unary ~s ~s)"
-	  (operator u)
-	  (right u)))
+	  (unary-operator u)
+	  (unary-right u)))

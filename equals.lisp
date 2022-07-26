@@ -18,3 +18,10 @@ Defaults to EQUALP."))
   (or (and (null a) (null b))  ;; recursive base case
       (and (equals (car a) (car b))
 	   (equals (cdr a) (cdr b)))))
+
+(defmethod equals ((a structure-object) (b structure-object))
+  (and (eq (class-of a) (class-of b))
+       (every (lambda (slot)
+		(equals (slot-value a (closer-mop:slot-definition-name slot))
+			(slot-value b (closer-mop:slot-definition-name slot))))
+	      (closer-mop:class-slots (class-of a)))))
