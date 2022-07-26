@@ -1,15 +1,17 @@
 (defpackage :cl-lox/tests
+  (:export :cl-lox-tests)
   (:use :cl :fiveam)
   (:import-from :cl-lox)
+  (:import-from :cl-lox/test-parse)
+  (:import-from :cl-lox/test-print-lox-ast)
+  (:import-from :cl-lox/test-suite :cl-lox-tests)
   (:import-from :cl-lox/equals :equals)
   (:import-from :cl-lox/scan)
   (:import-from :cl-lox/token :make-token)
-  (:import-from :cl-lox/tokens)
-  (:export :cl-lox-tests))
+  (:import-from :cl-lox/tokens))
 (in-package :cl-lox/tests)
 
-(def-suite* cl-lox-tests
-  :description "Tests for CL-LOX")
+(in-suite cl-lox-tests)
 
 (defclass lox-result ()
   ((stdout :accessor stdout)

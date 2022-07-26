@@ -2,7 +2,8 @@
   (:nicknames :cl-lox)
   (:use :cl)
   (:import-from :cl-lox/token :make-token)
-  (:export :main :make-token :run :run-prompt :run-file))
+  (:import-from :cl-lox/print-lox-ast :print-lox-ast)
+  (:export :main :make-token :print-lox-ast :run :run-prompt :run-file))
 (in-package :cl-lox/main)
 
 (defun run (code-str)
