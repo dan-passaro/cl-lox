@@ -1,13 +1,17 @@
 (defpackage :cl-lox/equals
   (:export :equals)
   (:documentation "Provide EQUALS, an CLOS-compatible equality function.")
-  (:use :cl))
+  (:use :cl)
+  (:import-from :closer-mop))
 (in-package :cl-lox/equals)
 
 (defgeneric equals (a b)
   (:documentation "Return if A and B are equal.
 
 Lists are EQUALS if all their elements are EQUALS.
+
+Structures are EQUALS if their classes are EQ and their slot values
+are all EQUALS.
 
 Defaults to EQUALP."))
 

@@ -13,11 +13,28 @@
 (defun parse-str (lox-code-str)
   (parse (scan-tokens lox-code-str)))
 
+(defun mk-op (token-type)
+  "Make a token used as the operator for some exprs"
+  (make-token token-type (symbol-value token-type) nil 1))
+
 (test parse-equality
   (is (equals (make-binary (make-literal 1.0)
-			   (make-token 'cl-lox/tokens:equal-equal
-				       "=="
-				       nil
-				       1)
+			   (mk-op 'cl-lox/tokens:equal-equal)
 			   (make-literal 2.0))
 	      (parse-str "1 == 2"))))
+
+(test parse-comparison
+  (is (equals (make-binary (make-literal 1.0)
+			   (mk-op 'cl-lox/tokens:greater)
+			   (make-literal 2.0))
+	      (parse-str "1 > 2"))))
+
+(test comparison-binds-tighter-than-equality
+  (is (equals (make-binary (make-binary (make-literal 1.0)
+					(mk-op 'cl-lox/tokens:greater)
+					(make-literal 2.0))
+			   (mk-op 'cl-lox/tokens:equal-equal)
+			   (make-binary (make-literal 3.0)
+					(mk-op 'cl-lox/tokens:greater)
+					(make-literal 4.0)))
+	      (parse-str "1 > 2 == 3 > 4"))))

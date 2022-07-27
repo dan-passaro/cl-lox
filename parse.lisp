@@ -13,9 +13,21 @@
 	       (equality))
 
 	     (equality ()
-	       (let ((expr (primary)))
+	       (let ((expr (comparison)))
 		 (loop while (match 'cl-lox/tokens:bang-equal
 			       'cl-lox/tokens:equal-equal)
+		       do (let ((operator (previous))
+				(right (comparison)))
+			    (setf expr (make-binary expr operator right))))
+		 expr))
+
+	     (comparison ()
+	       (let ((expr (primary)))
+		 (loop while (match
+				 'cl-lox/tokens:greater
+			       'cl-lox/tokens:greater-equal
+			       'cl-lox/tokens:less
+			       'cl-lox/tokens:less-equal)
 		       do (let ((operator (previous))
 				(right (primary)))
 			    (setf expr (make-binary expr operator right))))
