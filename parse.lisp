@@ -66,7 +66,7 @@
 	       (when (match 'cl-lox/tokens:number 'cl-lox/tokens:string)
 		 (return-from primary (make-literal
 				       (cl-lox/token:literal (previous)))))
-	       (when (match 'cl-lox/tokens:right-paren)
+	       (when (match 'cl-lox/tokens:left-paren)
 		 (let ((expr (expression)))
 		   (consume 'cl-lox/tokens:right-paren
 			    "Expect ')' after expression.")

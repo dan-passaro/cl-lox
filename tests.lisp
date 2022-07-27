@@ -2,6 +2,7 @@
   (:export :cl-lox-tests)
   (:use :cl :fiveam)
   (:import-from :cl-lox)
+  (:import-from :cl-lox/test-evaluate)
   (:import-from :cl-lox/test-parse)
   (:import-from :cl-lox/test-print-lox-ast)
   (:import-from :cl-lox/test-suite :cl-lox-tests)
