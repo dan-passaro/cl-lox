@@ -27,3 +27,15 @@ expr is an AST node (i.e. an instance of an expr subtype)"))
        (- right))
       (cl-lox/tokens:bang
        (not (is-truthy? right))))))
+
+(defmethod evaluate ((b binary))
+  (let ((left (evaluate (binary-left b)))
+	(right (evaluate (binary-right b))))
+    (ecase (token-type (binary-operator b))
+      (cl-lox/tokens:plus
+       (if (and (stringp left) (stringp right))
+	   (concatenate 'string left right)
+	   (+ left right)))
+      (cl-lox/tokens:minus (- left right))
+      (cl-lox/tokens:slash (/ left right))
+      (cl-lox/tokens:star (* left right)))))
