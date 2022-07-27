@@ -48,3 +48,8 @@
 			   (mk-op 'cl-lox/tokens:minus)
 			   (make-literal 4.0))
 	      (parse-str "1 + 2 * 3 - 4"))))
+
+(test parse-unary
+  (is (equals (make-unary (mk-op 'cl-lox/tokens:minus)
+			  (make-literal 3.0))
+	      (parse-str "-3"))))

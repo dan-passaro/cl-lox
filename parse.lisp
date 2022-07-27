@@ -42,12 +42,19 @@
 		 expr))
 
 	     (factor ()
-	       (let ((expr (primary)))
+	       (let ((expr (unary)))
 		 (loop while (match 'cl-lox/tokens:slash 'cl-lox/tokens:star)
 		       do (let ((operator (previous))
-				(right (primary)))
+				(right (unary)))
 			    (setf expr (make-binary expr operator right))))
 		 expr))
+
+	     (unary ()
+	       (if (match 'cl-lox/tokens:bang 'cl-lox/tokens:minus)
+		   (let ((operator (previous))
+			 (right (unary)))
+		     (make-unary operator right))
+		   (primary)))
 
 	     (primary ()
 	       (when (match 'cl-lox/tokens:false)
