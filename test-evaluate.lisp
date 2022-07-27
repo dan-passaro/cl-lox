@@ -1,6 +1,7 @@
 (defpackage :cl-lox/test-evaluate
   (:use :cl :fiveam)
   (:import-from :cl-lox/test-suite :cl-lox-tests)
+  (:import-from :cl-lox/test-parse :parse-expr-str)
   (:import-from :cl-lox/equals :equals)
   (:import-from :cl-lox/evaluate :evaluate)
   (:import-from :cl-lox/parse :parse)
@@ -10,7 +11,7 @@
 (in-suite cl-lox-tests)
 
 (defun eval-lox-expr (lox-expr-string)
-  (evaluate (parse (scan-tokens lox-expr-string))))
+  (evaluate (parse-expr-str lox-expr-string)))
 
 (test evaluate-literals
   (is (equals 3.0 (eval-lox-expr "3.0")))

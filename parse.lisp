@@ -1,8 +1,16 @@
 (defpackage :cl-lox/parse
   (:export :parse)
-  (:use :cl :cl-lox/equals :cl-lox/expr :cl-lox/token)
+  (:use :cl :cl-lox/equals :cl-lox/expr :cl-lox/stmt :cl-lox/token)
   (:shadowing-import-from :cl-lox/expr :literal)
-  (:import-from :cl-lox/tokens))
+  (:shadowing-import-from :cl-lox/tokens :print)
+  (:import-from :cl-lox/tokens
+   :semicolon
+		:greater
+   :greater-equal
+		:less
+   :less-equal
+		:bang-equal
+		:equal-equal))
 (in-package :cl-lox/parse)
 
 (defun parse (tokens)
@@ -12,10 +20,23 @@
     (labels ((expression ()
 	       (equality))
 
+	     (statement ()
+	       (if (match 'print) (print-statement)
+		   (expression-statement)))
+
+	     (print-statement ()
+	       (let ((value (expression)))
+		 (consume 'semicolon "Expect ';' after value.")
+		 (make-print-stmt value)))
+
+	     (expression-statement ()
+	       (let ((expr (expression)))
+		 (consume 'semicolon "Expect ';' after expression")
+		 (make-expression-stmt expr)))
+
 	     (equality ()
 	       (let ((expr (comparison)))
-		 (loop while (match 'cl-lox/tokens:bang-equal
-			       'cl-lox/tokens:equal-equal)
+		 (loop while (match 'bang-equal 'equal-equal)
 		       do (let ((operator (previous))
 				(right (comparison)))
 			    (setf expr (make-binary expr operator right))))
@@ -23,11 +44,7 @@
 
 	     (comparison ()
 	       (let ((expr (term)))
-		 (loop while (match
-				 'cl-lox/tokens:greater
-			       'cl-lox/tokens:greater-equal
-			       'cl-lox/tokens:less
-			       'cl-lox/tokens:less-equal)
+		 (loop while (match 'greater 'greater-equal 'less 'less-equal)
 		       do (let ((operator (previous))
 				(right (term)))
 			    (setf expr (make-binary expr operator right))))
@@ -95,4 +112,4 @@
 	     (peek () (aref tokens current))
 
 	     (previous () (aref tokens (1- current))))
-      (expression))))
+      (loop until (at-end?) collect (statement)))))

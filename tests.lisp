@@ -44,7 +44,11 @@
   (let ((result (run-and-capture "print \"Howdy\";")))
     (is (string= (format nil "Howdy~%")
 		 (stdout result)))
-    (is (string= "" (stderr result)))))
+    (is (string= "" (stderr result))))
+  ;; (let ((result (run-and-capture "print 10.0;")))
+  ;;   (is (string= (format nil "10~%")))
+  ;;   (is (string= "" (stderr result))))
+  )
 
 (test run-file
   (uiop:with-temporary-file (:stream fstream :pathname path)
@@ -96,3 +100,10 @@
 		    (make-token 'cl-lox/tokens:number "5" 5.0 1)
 		    *eof-token*)
 	      (cl-lox/scan:scan-tokens "!5"))))
+
+(test scans-semicolon
+  (is (equals (list (make-token 'cl-lox/tokens:print "print" nil 1)
+		    (make-token 'cl-lox/tokens:string "\"hello\"" "hello" 1)
+		    (make-token 'cl-lox/tokens:semicolon ";" nil 1)
+		    *eof-token*)
+	      (cl-lox/scan:scan-tokens "print \"hello\";"))))
