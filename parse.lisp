@@ -22,12 +22,28 @@
 		 expr))
 
 	     (comparison ()
-	       (let ((expr (primary)))
+	       (let ((expr (term)))
 		 (loop while (match
 				 'cl-lox/tokens:greater
 			       'cl-lox/tokens:greater-equal
 			       'cl-lox/tokens:less
 			       'cl-lox/tokens:less-equal)
+		       do (let ((operator (previous))
+				(right (term)))
+			    (setf expr (make-binary expr operator right))))
+		 expr))
+
+	     (term ()
+	       (let ((expr (factor)))
+		 (loop while (match 'cl-lox/tokens:minus 'cl-lox/tokens:plus)
+		       do (let ((operator (previous))
+				(right (factor)))
+			    (setf expr (make-binary expr operator right))))
+		 expr))
+
+	     (factor ()
+	       (let ((expr (primary)))
+		 (loop while (match 'cl-lox/tokens:slash 'cl-lox/tokens:star)
 		       do (let ((operator (previous))
 				(right (primary)))
 			    (setf expr (make-binary expr operator right))))

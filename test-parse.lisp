@@ -38,3 +38,13 @@
 					(mk-op 'cl-lox/tokens:greater)
 					(make-literal 4.0)))
 	      (parse-str "1 > 2 == 3 > 4"))))
+
+(test parse-arithmetic
+  (is (equals (make-binary (make-binary (make-literal 1.0)
+					(mk-op 'cl-lox/tokens:plus)
+					(make-binary (make-literal 2.0)
+						     (mk-op 'cl-lox/tokens:star)
+						     (make-literal 3.0)))
+			   (mk-op 'cl-lox/tokens:minus)
+			   (make-literal 4.0))
+	      (parse-str "1 + 2 * 3 - 4"))))
