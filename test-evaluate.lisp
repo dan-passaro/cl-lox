@@ -12,10 +12,14 @@
 (defun eval-lox-expr (lox-expr-string)
   (evaluate (parse (scan-tokens lox-expr-string))))
 
-(test evaluates-literals
+(test evaluate-literals
   (is (equals 3.0 (eval-lox-expr "3.0")))
   (is (equals "hello world" (eval-lox-expr "\"hello world\""))))
 
-(test evaluates-groupings
+(test evaluate-groupings
   (is (equals 3.0 (eval-lox-expr "(3.0)")))
   (is (equals "hello world" (eval-lox-expr "(\"hello world\")"))))
+
+(test evaluate-unary
+  (is (equals -15.5 (eval-lox-expr "-15.5")))
+  (is (equals t (eval-lox-expr "!false"))))

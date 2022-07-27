@@ -90,7 +90,7 @@
 		   (#\* (add-token 'cl-lox/tokens:star))
 		   (#\! (add-token (if (match #\=)
 				       'cl-lox/tokens:bang-equal
-				       'cl-lox/tokens:equal)))
+				       'cl-lox/tokens:bang)))
 		   (#\= (add-token (if (match #\=)
 				       'cl-lox/tokens:equal-equal
 				       'cl-lox/tokens:equal)))

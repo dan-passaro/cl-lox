@@ -90,3 +90,9 @@
   (is (equals (list (make-token 'cl-lox/tokens:false "false" nil 1)
 		    *eof-token*)
 	      (cl-lox/scan:scan-tokens "false"))))
+
+(test scans-bang
+  (is (equals (list (make-token 'cl-lox/tokens:bang "!" nil 1)
+		    (make-token 'cl-lox/tokens:number "5" 5.0 1)
+		    *eof-token*)
+	      (cl-lox/scan:scan-tokens "!5"))))
