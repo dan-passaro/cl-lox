@@ -30,3 +30,19 @@
   (is (equals 4 (eval-lox-expr "40 / 10")))
   (is (equals 10 (eval-lox-expr "5 + 5")))
   (is (equals "foobar" (eval-lox-expr "\"foo\" + \"bar\""))))
+
+(test evaluate-comparison-operators
+  (is (eq t (eval-lox-expr "3 < 4")))
+  (is (eq :false (eval-lox-expr "3 > 4")))
+  (is (eq t (eval-lox-expr "50 <= 50")))
+  (is (eq :false (eval-lox-expr "51 <= 50")))
+  (is (eq t (eval-lox-expr "20.5 > 20.2")))
+  (is (eq :false (eval-lox-expr "20.2 > 20.5")))
+  (is (eq t (eval-lox-expr "123 >= 123")))
+  (is (eq :false (eval-lox-expr "122 >= 123"))))
+
+(test evaluate-equality-operators
+  (is (eq t (eval-lox-expr "40 == 40")))
+  (is (eq :false (eval-lox-expr "41 == 40")))
+  (is (eq t (eval-lox-expr "\"hello\" == \"hello\"")))
+  (is (eq :false (eval-lox-expr "\"henlo\" == \"hello\""))))

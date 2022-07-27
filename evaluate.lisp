@@ -28,6 +28,12 @@ expr is an AST node (i.e. an instance of an expr subtype)"))
       (cl-lox/tokens:bang
        (not (is-truthy? right))))))
 
+(defun to-bool (val)
+  (or val :false))
+
+(defun lox-is-equal (a b)
+  (eql a b))
+
 (defmethod evaluate ((b binary))
   (let ((left (evaluate (binary-left b)))
 	(right (evaluate (binary-right b))))
@@ -38,4 +44,9 @@ expr is an AST node (i.e. an instance of an expr subtype)"))
 	   (+ left right)))
       (cl-lox/tokens:minus (- left right))
       (cl-lox/tokens:slash (/ left right))
-      (cl-lox/tokens:star (* left right)))))
+      (cl-lox/tokens:star (* left right))
+      (cl-lox/tokens:less (to-bool (< left right)))
+      (cl-lox/tokens:less-equal (to-bool (<= left right)))
+      (cl-lox/tokens:greater (to-bool (> left right)))
+      (cl-lox/tokens:greater-equal (to-bool (>= left right)))
+      (cl-lox/tokens:equal-equal (to-bool (equals left right))))))
