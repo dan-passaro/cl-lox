@@ -45,10 +45,9 @@
     (is (string= (format nil "Howdy~%")
 		 (stdout result)))
     (is (string= "" (stderr result))))
-  ;; (let ((result (run-and-capture "print 10.0;")))
-  ;;   (is (string= (format nil "10~%")))
-  ;;   (is (string= "" (stderr result))))
-  )
+  (let ((result (run-and-capture "print 10.0;")))
+    (is (equals (format nil "10~%") (stdout result)))
+    (is (equals "" (stderr result)))))
 
 (test run-file
   (uiop:with-temporary-file (:stream fstream :pathname path)

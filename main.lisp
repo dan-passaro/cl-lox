@@ -1,6 +1,9 @@
 (defpackage :cl-lox/main
   (:nicknames :cl-lox)
   (:use :cl)
+  (:import-from :cl-lox/interpret :interpret)
+  (:import-from :cl-lox/parse :parse)
+  (:import-from :cl-lox/scan :scan-tokens)
   (:import-from :cl-lox/token :make-token)
   (:import-from :cl-lox/print-lox-ast :print-lox-ast)
   (:export :main :make-token :print-lox-ast :run :run-prompt :run-file))
@@ -8,12 +11,7 @@
 
 (defun run (code-str)
   "Parse and then execute code-str."
-
-  ;; For now, hardcoded to assume a one-line "print" instruction. MVP :)
-  (let* ((first-quote-pos (position #\" code-str))
-	 (second-quote-pos (position #\" code-str :start (1+ first-quote-pos)))
-	 (str-content (subseq code-str (1+ first-quote-pos) second-quote-pos)))
-    (format t "~a~%" str-content)))
+  (interpret (parse (scan-tokens code-str))))
 
 (defun println (text)
   (format t text)
