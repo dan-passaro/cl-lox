@@ -63,7 +63,8 @@
 		 (let ((expr (expression)))
 		   (consume 'cl-lox/tokens:right-paren
 			    "Expect ')' after expression.")
-		   (make-grouping expr))))
+		   (return-from primary (make-grouping expr))))
+	       (error (format nil "unexpected token ~s" (peek))))
 
 	     (match (&rest token-types)
 	       (and (some (function check) token-types)
