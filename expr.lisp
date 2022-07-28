@@ -14,8 +14,16 @@
    :unary
    :make-unary
    :unary-operator
-   :unary-right)
+   :unary-right
+   :variable
+   :make-variable
+   :variable-name
+   :assign
+   :make-assign
+   :assign-name
+   :assign-value)
   (:use :cl)
+  (:shadow :variable)
   (:import-from :cl-lox/token :token))
 (in-package :cl-lox/expr)
 
@@ -58,3 +66,22 @@
   (format s "#.(cl-lox/expr:make-unary ~s ~s)"
 	  (unary-operator u)
 	  (unary-right u)))
+
+(defstruct (variable (:include expr)
+		     (:constructor make-variable (name)))
+  (name (:type token)))
+
+(defmethod print-object ((v variable) s)
+  (format s "#.(~(~s~) ~s)"
+	  'make-variable
+	  (variable-name v)))
+
+(defstruct (assign (:include expr)
+		   (:constructor make-assign (name value)))
+  name
+  value)
+
+(defmethod print-object ((a assign) s)
+  (format s "#.(cl-lox/expr:make-assign ~s ~s)"
+	  (assign-name a)
+	  (assign-value a)))

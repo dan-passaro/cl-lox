@@ -106,3 +106,13 @@
 		    (make-token 'cl-lox/tokens:semicolon ";" nil 1)
 		    *eof-token*)
 	      (cl-lox/scan:scan-tokens "print \"hello\";"))))
+
+(test assigns-toplevel-variables
+  (let ((result (run-and-capture "
+var a = 1;
+var b = 2;
+print a + b;
+")))
+    (is (string= (format nil "3~%")
+		 (stdout result)))
+    (is (string= "" (stderr result)))))

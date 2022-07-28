@@ -6,7 +6,8 @@
   (:import-from :cl-lox/parse :parse)
   (:import-from :cl-lox/token :make-token)
   (:import-from :cl-lox/tokens)
-  (:import-from :cl-lox/scan :scan-tokens))
+  (:import-from :cl-lox/scan :scan-tokens)
+  (:shadowing-import-from :cl-lox/expr :variable))
 (in-package :cl-lox/test-parse)
 
 (in-suite cl-lox-tests)

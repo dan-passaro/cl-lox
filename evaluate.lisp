@@ -1,7 +1,9 @@
 (defpackage :cl-lox/evaluate
   (:export :evaluate)
   (:use :cl :cl-lox/equals :cl-lox/expr :cl-lox/token)
-  (:shadowing-import-from :cl-lox/expr :literal)
+  (:shadowing-import-from :cl-lox/expr
+   :literal
+			  :variable)
   (:import-from :cl-lox/tokens))
 (in-package :cl-lox/evaluate)
 

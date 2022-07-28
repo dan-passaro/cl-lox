@@ -1,7 +1,9 @@
 (defpackage :cl-lox/print-lox-ast
   (:export :print-lox-ast)
   (:use :cl :cl-lox/expr)
-  (:import-from :cl-lox/token))
+  (:import-from :cl-lox/token)
+  (:shadowing-import-from :cl-lox/expr
+			  :variable))
 (in-package :cl-lox/print-lox-ast)
 
 (defgeneric print-lox-ast (expr)

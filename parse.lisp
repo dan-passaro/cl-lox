@@ -1,8 +1,12 @@
 (defpackage :cl-lox/parse
   (:export :parse)
   (:use :cl :cl-lox/equals :cl-lox/expr :cl-lox/stmt :cl-lox/token)
-  (:shadowing-import-from :cl-lox/expr :literal)
-  (:shadowing-import-from :cl-lox/tokens :print)
+  (:shadowing-import-from :cl-lox/expr
+   :literal
+			  :variable)
+  (:shadowing-import-from :cl-lox/tokens
+   :print
+			  :equal)
   (:import-from :cl-lox/tokens
    :semicolon
 		:greater
@@ -10,7 +14,8 @@
 		:less
    :less-equal
 		:bang-equal
-		:equal-equal))
+   :equal-equal
+		:identifier))
 (in-package :cl-lox/parse)
 
 (defun parse (tokens)
@@ -19,6 +24,21 @@
   (let ((current 0))
     (labels ((expression ()
 	       (equality))
+
+	     (declaration ()
+	       (if (match 'cl-lox/tokens:var)
+		   (var-declaration)
+		   (statement)))
+
+	     (var-declaration ()
+	       (let ((name (consume 'identifier
+				    "Expect variable name."))
+		     initializer)
+		 (when (match 'equal)
+		   (setf initializer (expression)))
+		 (consume 'semicolon
+			  "Expect ';' after variable declaration.")
+		 (make-var-stmt name initializer)))
 
 	     (statement ()
 	       (if (match 'print) (print-statement)
@@ -74,21 +94,25 @@
 		   (primary)))
 
 	     (primary ()
-	       (when (match 'cl-lox/tokens:false)
-		 (return-from primary (make-literal :false)))
-	       (when (match 'cl-lox/tokens:true)
-		 (return-from primary (make-literal t)))
-	       (when (match 'cl-lox/tokens:nil)
-		 (return-from primary (make-literal nil)))
-	       (when (match 'cl-lox/tokens:number 'cl-lox/tokens:string)
-		 (return-from primary (make-literal
-				       (cl-lox/token:literal (previous)))))
-	       (when (match 'cl-lox/tokens:left-paren)
-		 (let ((expr (expression)))
-		   (consume 'cl-lox/tokens:right-paren
+	       (cond ((match 'cl-lox/tokens:false)
+		      (make-literal :false))
+		     ((match 'cl-lox/tokens:true)
+		      (make-literal t))
+		     ((match 'cl-lox/tokens:nil)
+		      (make-literal nil))
+		     ((match 'cl-lox/tokens:number
+			'cl-lox/tokens:string)
+		      (make-literal
+		       (cl-lox/token:literal (previous))))
+		     ((match 'identifier)
+		      (make-variable (previous)))
+		     ((match 'cl-lox/tokens:left-paren)
+		      (let ((expr (expression)))
+			(consume 'cl-lox/tokens:right-paren
 			    "Expect ')' after expression.")
-		   (return-from primary (make-grouping expr))))
-	       (error (format nil "Expect expression: ~s" (peek))))
+			(make-grouping expr)))
+		     (t (error (format nil "Expect expression: ~s"
+				       (peek))))))
 
 	     (match (&rest token-types)
 	       (and (some (function check) token-types)
@@ -112,4 +136,4 @@
 	     (peek () (aref tokens current))
 
 	     (previous () (aref tokens (1- current))))
-      (loop until (at-end?) collect (statement)))))
+      (loop until (at-end?) collect (declaration)))))

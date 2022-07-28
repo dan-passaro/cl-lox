@@ -22,9 +22,11 @@
 
 Alternatively, if given a list, interprets all statements in that list"))
 
+(defmethod interpret ((statements list))
+  (dolist (statement statements) (interpret statement)))
+
 (defmethod interpret ((p print-stmt))
   (let ((value (evaluate (print-stmt-expression p))))
     (format t "~a~%" (stringify value))))
 
-(defmethod interpret ((statements list))
-  (dolist (statement statements) (interpret statement)))
+(defmethod interpret ((v var-stmt)))

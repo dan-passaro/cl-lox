@@ -3,7 +3,9 @@
   (:import-from :cl-lox/test-suite :cl-lox-tests)
   (:import-from :cl-lox/equals :equals)
   (:import-from :cl-lox/token :make-token)
-  (:import-from :cl-lox/tokens))
+  (:import-from :cl-lox/tokens)
+  (:shadowing-import-from :cl-lox/expr
+   :variable))
 (in-package :cl-lox/test-print-lox-ast)
 
 (in-suite cl-lox-tests)
