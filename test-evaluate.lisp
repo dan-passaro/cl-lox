@@ -11,7 +11,8 @@
 (in-suite cl-lox-tests)
 
 (defun eval-lox-expr (lox-expr-string)
-  (evaluate (parse-expr-str lox-expr-string)))
+  (let ((environment (make-hash-table)))
+    (evaluate (parse-expr-str lox-expr-string) environment)))
 
 (test evaluate-literals
   (is (equals 3.0 (eval-lox-expr "3.0")))

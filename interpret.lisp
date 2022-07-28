@@ -3,7 +3,9 @@
 
   (:use :cl :cl-lox/stmt)
   (:import-from :str)
-  (:import-from :cl-lox/evaluate :evaluate))
+  (:import-from :cl-lox/environment :make-environment)
+  (:import-from :cl-lox/evaluate :evaluate)
+  (:import-from :cl-lox/token :lexeme))
 (in-package :cl-lox/interpret)
 
 (defun stringify (lox-value)
@@ -17,16 +19,22 @@
 	       text)))
 	(t (princ-to-string lox-value))))
 
-(defgeneric interpret (statement)
+(defgeneric interpret (statement environment)
   (:documentation "Interpret the given Lox statement.
 
 Alternatively, if given a list, interprets all statements in that list"))
 
-(defmethod interpret ((statements list))
-  (dolist (statement statements) (interpret statement)))
+(defmethod interpret ((statements list) environment)
+  (unless environment (setf environment (make-environment)))
+  (dolist (statement statements) (interpret statement environment)))
 
-(defmethod interpret ((p print-stmt))
-  (let ((value (evaluate (print-stmt-expression p))))
+(defmethod interpret ((p print-stmt) environment)
+  (let ((value (evaluate (print-stmt-expression p) environment)))
     (format t "~a~%" (stringify value))))
 
-(defmethod interpret ((v var-stmt)))
+(defmethod interpret ((v var-stmt) environment)
+
+  ;; TODO: handle statements with no initializers
+  (let ((value (evaluate (var-stmt-initializer v) environment)))
+    (setf (gethash (lexeme (var-stmt-name v)) environment)
+	  value)))

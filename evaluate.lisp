@@ -4,6 +4,7 @@
   (:shadowing-import-from :cl-lox/expr
    :literal
 			  :variable)
+  (:import-from :cl-lox/environment :get-lox-variable)
   (:import-from :cl-lox/tokens))
 (in-package :cl-lox/evaluate)
 
@@ -11,19 +12,19 @@
   (not (or (null value)
 	   (eq value :false))))
 
-(defgeneric evaluate (expr)
+(defgeneric evaluate (expr environment)
   (:documentation "Evaluate the given Lox expression.
 
 expr is an AST node (i.e. an instance of an expr subtype)"))
 
-(defmethod evaluate ((l literal))
+(defmethod evaluate ((l literal) environment)
   (literal-value l))
 
-(defmethod evaluate ((g grouping))
-  (evaluate (grouping-expression g)))
+(defmethod evaluate ((g grouping) environment)
+  (evaluate (grouping-expression g) environment))
 
-(defmethod evaluate ((u unary))
-  (let ((right (evaluate (unary-right u))))
+(defmethod evaluate ((u unary) environment)
+  (let ((right (evaluate (unary-right u) environment)))
     (ecase (token-type (unary-operator u))
       (cl-lox/tokens:minus
        (- right))
@@ -36,9 +37,9 @@ expr is an AST node (i.e. an instance of an expr subtype)"))
 (defun lox-is-equal (a b)
   (eql a b))
 
-(defmethod evaluate ((b binary))
-  (let ((left (evaluate (binary-left b)))
-	(right (evaluate (binary-right b))))
+(defmethod evaluate ((b binary) environment)
+  (let ((left (evaluate (binary-left b) environment))
+	(right (evaluate (binary-right b) environment)))
     (ecase (token-type (binary-operator b))
       (cl-lox/tokens:plus
        (if (and (stringp left) (stringp right))
@@ -52,3 +53,6 @@ expr is an AST node (i.e. an instance of an expr subtype)"))
       (cl-lox/tokens:greater (to-bool (> left right)))
       (cl-lox/tokens:greater-equal (to-bool (>= left right)))
       (cl-lox/tokens:equal-equal (to-bool (equals left right))))))
+
+(defmethod evaluate ((v variable) environment)
+  (get-lox-variable (variable-name v) environment))

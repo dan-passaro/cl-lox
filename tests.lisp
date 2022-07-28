@@ -1,6 +1,8 @@
 (defpackage :cl-lox/tests
   (:export :cl-lox-tests)
+
   (:use :cl :fiveam)
+  (:import-from :str)
   (:import-from :cl-lox)
   (:import-from :cl-lox/test-evaluate)
   (:import-from :cl-lox/test-parse)
@@ -34,7 +36,7 @@
 		(get-output-stream-string *error-output*))))
 
 (defun run-and-capture (lox-source)
-  (capture-result 'cl-lox:run lox-source))
+  (capture-result 'cl-lox:run (str:trim-left lox-source)))
 
 (test print-statement
   (let ((result (run-and-capture "print \"Hello\";")))
@@ -116,3 +118,10 @@ print a + b;
     (is (string= (format nil "3~%")
 		 (stdout result)))
     (is (string= "" (stderr result)))))
+
+(test errors-on-accessing-undefined-variable
+  (skip "not yet implemented")
+  (when nil  ;; replace this WHEN with the LET to include this test
+    (let ((result (run-and-capture"print a;")))
+      (is (string= "" (stdout result)))
+      (is (string= "'a': Undefined variable." (stderr result))))))

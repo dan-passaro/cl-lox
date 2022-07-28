@@ -1,6 +1,7 @@
 (defpackage :cl-lox/main
   (:nicknames :cl-lox)
   (:use :cl)
+  (:import-from :cl-lox/environment :make-environment)
   (:import-from :cl-lox/interpret :interpret)
   (:import-from :cl-lox/parse :parse)
   (:import-from :cl-lox/scan :scan-tokens)
@@ -9,9 +10,10 @@
   (:export :main :make-token :print-lox-ast :run :run-prompt :run-file))
 (in-package :cl-lox/main)
 
-(defun run (code-str)
+(defun run (code-str &optional environment)
   "Parse and then execute code-str."
-  (interpret (parse (scan-tokens code-str))))
+  (let ((code-ast (parse (scan-tokens code-str))))
+    (interpret code-ast environment)))
 
 (defun println (text)
   (format t text)
