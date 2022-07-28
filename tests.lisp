@@ -138,3 +138,15 @@ print a + b;
     (is (string= "" (stdout result)))
     (is (string= (format nil "Operand must be a number.~%[line 1]~%")
 		 (stderr result)))))
+
+(test reports-syntax-errors
+  (let ((result (run-and-capture "+-;")))
+    (is (string= "" (stdout result)))
+    (is (string= (format nil "~{~a~%~}"
+			 '("[line 1] Error at '+': Expect expression."
+			   "[line 1] Error at ';': Expect expression."))
+		 (stderr result))))
+  (let ((result (run-and-capture "(3;")))
+    (is (string= "" (stdout result)))
+    (is (string= (format nil "[line 1] Error at ';': Expect ')' after expression.~%")
+		 (stderr result)))))

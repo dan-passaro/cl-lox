@@ -7,6 +7,8 @@
   (:shadowing-import-from :cl-lox/tokens
    :print
 			  :equal)
+  (:import-from :cl-lox/lox-parse-error :lox-parse-error)
+  (:import-from :cl-lox/report-error :lox-error)
   (:import-from :cl-lox/tokens
    :semicolon
 		:greater
@@ -18,6 +20,10 @@
 		:identifier))
 (in-package :cl-lox/parse)
 
+(defun lox-parse-error (token message)
+  (lox-error token message)
+  (make-condition 'lox-parse-error))
+
 (defun parse (tokens)
   (setf tokens (make-array (length tokens) :adjustable t
 					   :initial-contents tokens))
@@ -26,9 +32,13 @@
 	       (equality))
 
 	     (declaration ()
-	       (if (match 'cl-lox/tokens:var)
-		   (var-declaration)
-		   (statement)))
+	       (handler-case
+		   (if (match 'cl-lox/tokens:var)
+		       (var-declaration)
+		       (statement))
+		 (lox-parse-error ()
+		   (advance)
+		   nil)))
 
 	     (var-declaration ()
 	       (let ((name (consume 'identifier
@@ -111,8 +121,8 @@
 			(consume 'cl-lox/tokens:right-paren
 			    "Expect ')' after expression.")
 			(make-grouping expr)))
-		     (t (error (format nil "Expect expression: ~s"
-				       (peek))))))
+		     (t (error (lox-parse-error (peek)
+						"Expect expression.")))))
 
 	     (match (&rest token-types)
 	       (and (some (function check) token-types)
@@ -120,7 +130,6 @@
 
 	     (check (tok-type)
 	       (and (not (at-end?)) (equals (token-type (peek)) tok-type)))
-
 	     (advance ()
 	       (when (not (at-end?))
 		 (incf current))
@@ -128,7 +137,7 @@
 
 	     (consume (tok-type error-message)
 	       (if (check tok-type) (advance)
-		   (error (format nil "~s ~s" (peek) error-message))))
+		   (error (lox-parse-error (peek) error-message))))
 
 	     (at-end? ()
 	       (eq (token-type (peek)) 'cl-lox/tokens:eof))
