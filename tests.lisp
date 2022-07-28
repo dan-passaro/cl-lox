@@ -68,6 +68,14 @@
 		   (stdout result)))
       (is (string= "" (stderr result))))))
 
+(test run-prompt-allows-variables
+  (with-input-from-string (*standard-input*
+			   (format nil "var a = 3;~%print a;~%"))
+    (let ((result (capture-result 'cl-lox:run-prompt)))
+      (is (string= (format nil "> > 3~%> ")
+		   (stdout result)))
+      (is (string= "" (stderr result))))))
+
 (test scans-numbers
   (is (equals (list (make-token 'cl-lox/tokens:number "3" 3.0 1)
 		    (make-token 'cl-lox/tokens:plus "+" nil 1)

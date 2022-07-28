@@ -27,14 +27,15 @@
 (defun run-prompt ()
   "Start an interactive Lox shell."
   (block prompt-loop
-    (loop
+    (let ((lox-environment (make-environment)))
+      (loop
        (princ "> ")
        (finish-output)
 
        (let* ((line (read-line *standard-input* nil))
 	      (line-empty (or (not line) (string= line ""))))
 	 (when line-empty (return-from prompt-loop))
-	 (run line)))))
+	 (run line lox-environment))))))
 
 (defun main ()
   "Toplevel entry point for a cl-lox binary."
