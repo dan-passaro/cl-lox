@@ -128,8 +128,13 @@ print a + b;
     (is (string= "" (stderr result)))))
 
 (test errors-on-accessing-undefined-variable
-  (skip "not yet implemented")
-  (when nil  ;; replace this WHEN with the LET to include this test
-    (let ((result (run-and-capture"print a;")))
-      (is (string= "" (stdout result)))
-      (is (string= "'a': Undefined variable." (stderr result))))))
+  (let ((result (run-and-capture "print a;")))
+    (is (string= "" (stdout result)))
+    (is (string= (format nil "Undefined variable 'a'.~%[line 1]~%")
+		 (stderr result)))))
+
+(test errors-on-negating-string
+  (let ((result (run-and-capture "print -\"foo\";")))
+    (is (string= "" (stdout result)))
+    (is (string= (format nil "Operand must be a number.~%[line 1]~%")
+		 (stderr result)))))

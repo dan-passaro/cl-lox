@@ -4,6 +4,7 @@
 	   :get-lox-variable)
 
   (:use :cl)
+  (:import-from :cl-lox/lox-runtime-error :lox-runtime-error)
   (:import-from :cl-lox/token :lexeme))
 (in-package :cl-lox/environment)
 
@@ -11,4 +12,12 @@
   (make-hash-table :test 'equalp))
 
 (defun get-lox-variable (variable-name environment)
-  (gethash (lexeme variable-name) environment))
+  (multiple-value-bind
+	(value key-found?)
+      (gethash (lexeme variable-name) environment)
+    (unless key-found?
+      (error 'lox-runtime-error
+	     :token variable-name
+	     :message (format nil "Undefined variable '~a'."
+			      (lexeme variable-name))))
+    value))

@@ -5,12 +5,18 @@
    :literal
 			  :variable)
   (:import-from :cl-lox/environment :get-lox-variable)
+  (:import-from :cl-lox/lox-runtime-error :lox-runtime-error)
   (:import-from :cl-lox/tokens))
 (in-package :cl-lox/evaluate)
 
 (defun is-truthy? (value)
   (not (or (null value)
 	   (eq value :false))))
+
+(defun check-number-operand (operator operand)
+  (when (not (floatp operand))
+    (error 'lox-runtime-error :token operator
+			      :message "Operand must be a number.")))
 
 (defgeneric evaluate (expr environment)
   (:documentation "Evaluate the given Lox expression.
@@ -27,6 +33,7 @@ expr is an AST node (i.e. an instance of an expr subtype)"))
   (let ((right (evaluate (unary-right u) environment)))
     (ecase (token-type (unary-operator u))
       (cl-lox/tokens:minus
+       (check-number-operand (unary-operator u) right)
        (- right))
       (cl-lox/tokens:bang
        (not (is-truthy? right))))))
