@@ -194,7 +194,17 @@ print a + b;
     (is (string= (join-lines "false") (stdout result)))
     (is (string= "" (stderr result)))))
 
-;; TODO: ensure scanner errors are reported properly (i.e. test
-;; unterminated string behavior)
+(test errors-on-unterminated-string
+  (let ((result (run-and-capture "print \"hello!;")))
+    (is (string= "" (stdout result)))
+    (is (string= (join-lines "[line 1] Error: Unterminated string."
+			     "[line 1] Error at end: Expect expression.")
+		 (stderr result)))))
+
+(test errors-on-unrecognized-character
+  (let ((result (run-and-capture "@")))
+    (is (string= "" (stdout result)))
+    (is (string= (join-lines "[line 1] Error: Unexpected character.")
+		 (stderr result)))))
 
 ;; TODO: ensure all binary operators typecheck appropriately

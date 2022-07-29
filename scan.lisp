@@ -2,6 +2,7 @@
   (:export :scan-tokens)
 
   (:use :cl :cl-lox/equals)
+  (:import-from :cl-lox/report-error :lox-error)
   (:import-from :cl-lox/token :make-token)
   (:import-from :cl-lox/tokens))
 (in-package :cl-lox/scan)
@@ -43,7 +44,8 @@
 			  (incf line))
 			(advance))
 	       (when (is-at-end)
-		 (error "Unterminated string"))
+		 (lox-error line "Unterminated string.")
+		 (return-from str))
 	       (advance)  ;; eat the closing quote
 	       (let ((value (subseq source (1+ start) (1- current))))
 		 (add-token 'cl-lox/tokens:string value)))
@@ -121,7 +123,7 @@
 			  ((is-alpha? c)
 			   (identifier))
 			  (t
-			   (error "Shouldn't get here; unrecognized character"))))))))
+			   (lox-error line "Unexpected character."))))))))
       (loop until (is-at-end)
 	    do (setf start current)
 	       (scan-token)))
