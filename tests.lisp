@@ -26,6 +26,12 @@
     (setf (stderr result) stderr)
     result))
 
+(defmethod print-object ((r lox-result) s)
+  (format s "#.(~(~s~) ~s ~s)"
+	  'lox-result
+	  (stdout r)
+	  (stderr r)))
+
 (defparameter *eof-token* (make-token 'cl-lox/tokens:eof "" nil 1))
 
 (defun capture-result (func &rest args)
@@ -38,6 +44,12 @@
 (defun run-and-capture (lox-source)
   (setf cl-lox/report-error:*had-error* nil)
   (capture-result 'cl-lox:run (str:trim-left lox-source)))
+
+(defun run-prompt-and-capture (&rest lines)
+  (setf cl-lox/report-error:*had-error* nil)
+  (with-input-from-string (*standard-input*
+			   (apply 'join-lines lines))
+    (capture-result 'cl-lox:run-prompt)))
 
 (test print-statement
   (let ((result (run-and-capture "print \"Hello\";")))
@@ -62,32 +74,28 @@
       (is (string= "" (stderr result))))))
 
 (test run-prompt
-  (with-input-from-string (*standard-input*
-			   (format nil "print \"I'm in a prompt\";~%"))
-    (let ((result (capture-result 'cl-lox:run-prompt)))
-      (is (string= (format nil "> I'm in a prompt~%> ")
-		   (stdout result)))
-      (is (string= "" (stderr result))))))
+  (let ((result (run-prompt-and-capture "print \"I'm in a prompt\";")))
+    (is (string= (format nil "> I'm in a prompt~%> ")
+		 (stdout result)))
+    (is (string= "" (stderr result)))))
 
 (test run-prompt-allows-variables
-  (with-input-from-string (*standard-input*
-			   (format nil "var a = 3;~%print a;~%"))
-    (let ((result (capture-result 'cl-lox:run-prompt)))
-      (is (string= (format nil "> > 3~%> ")
-		   (stdout result)))
-      (is (string= "" (stderr result))))))
+  (let ((result (run-prompt-and-capture
+		 "var a = 3;"
+		 "print a;")))
+    (is (string= (format nil "> > 3~%> ")
+		 (stdout result)))
+    (is (string= "" (stderr result)))))
 
 (test run-prompt-continues-after-error
-  (with-input-from-string (*standard-input*
-			   (join-lines
-			    "print 1;"
-			    "print +;"
-			    "print 2;"))
-    (let ((result (capture-result 'cl-lox:run-prompt)))
-      (is (string= (format nil "> 1~%> > 2~%> ")
-		   (stdout result)))
-      (is (string= (join-lines "[line 1] Error at '+': Expect expression.")
-		   (stderr result))))))
+  (let ((result (run-prompt-and-capture
+		 "print 1;"
+		 "print +;"
+		 "print 2;")))
+    (is (string= (format nil "> 1~%> > 2~%> ")
+		 (stdout result)))
+    (is (string= (join-lines "[line 1] Error at '+': Expect expression.")
+		 (stderr result)))))
 
 (test scans-numbers
   (is (equals (list (make-token 'cl-lox/tokens:number "3" 3.0 1)
@@ -184,8 +192,6 @@ print a + b;
 ;; TODO: allow prompt code to omit semicolon, and if it's an expr with
 ;; no semicolon, always print the result. E.g. "> 3+4" at the prompt
 ;; should result in "7" on the next line, not an error message.
-
-;; TODO: ensure prompt continues to work even if one line errors
 
 ;; TODO: ensure scanner errors are reported properly (i.e. test
 ;; unterminated string behavior)
