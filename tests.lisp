@@ -176,7 +176,10 @@ print a + b;
 		  "[line 3] Error at ';': Expect ')' after expression.")
 		 (stderr result)))))
 
-;; TODO: fix `!true` evaulating to `nil` when it should be `false`
+(test negating-true-gives-false
+  (let ((result (run-and-capture "print !true;")))
+    (is (string= (join-lines "false") (stdout result)))
+    (is (string= "" (stderr result)))))
 
 ;; TODO: allow prompt code to omit semicolon, and if it's an expr with
 ;; no semicolon, always print the result. E.g. "> 3+4" at the prompt
@@ -186,3 +189,5 @@ print a + b;
 
 ;; TODO: ensure scanner errors are reported properly (i.e. test
 ;; unterminated string behavior)
+
+;; TODO: ensure all binary operators typecheck appropriately

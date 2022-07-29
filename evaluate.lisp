@@ -36,7 +36,8 @@ expr is an AST node (i.e. an instance of an expr subtype)"))
        (check-number-operand (unary-operator u) right)
        (- right))
       (cl-lox/tokens:bang
-       (not (is-truthy? right))))))
+       (or (not (is-truthy? right))
+	   :false)))))
 
 (defun to-bool (val)
   (or val :false))
