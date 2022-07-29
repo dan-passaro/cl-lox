@@ -36,6 +36,7 @@
 		(get-output-stream-string *error-output*))))
 
 (defun run-and-capture (lox-source)
+  (setf cl-lox/report-error:*had-error* nil)
   (capture-result 'cl-lox:run (str:trim-left lox-source)))
 
 (test print-statement
@@ -142,11 +143,34 @@ print a + b;
 (test reports-syntax-errors
   (let ((result (run-and-capture "+-;")))
     (is (string= "" (stdout result)))
-    (is (string= (format nil "~{~a~%~}"
-			 '("[line 1] Error at '+': Expect expression."
-			   "[line 1] Error at ';': Expect expression."))
+    (is (string= (join-lines
+		  "[line 1] Error at '+': Expect expression.")
 		 (stderr result))))
   (let ((result (run-and-capture "(3;")))
     (is (string= "" (stdout result)))
     (is (string= (format nil "[line 1] Error at ';': Expect ')' after expression.~%")
 		 (stderr result)))))
+
+(defun join-lines (&rest lines)
+  (format nil "~{~a~%~}" lines))
+
+(test synchronizes-after-parse-error
+  (let ((result (run-and-capture "print 3++5-*\"hello\";
+ print 5;
+ print (4;")))
+    (is (string= "" (stdout result)))
+    (is (string= (join-lines
+		  "[line 1] Error at '+': Expect expression."
+		  "[line 3] Error at ';': Expect ')' after expression.")
+		 (stderr result)))))
+
+;; TODO: fix `!true` evaulating to `nil` when it should be `false`
+
+;; TODO: allow prompt code to omit semicolon, and if it's an expr with
+;; no semicolon, always print the result. E.g. "> 3+4" at the prompt
+;; should result in "7" on the next line, not an error message.
+
+;; TODO: ensure prompt continues to work even if one line errors
+
+;; TODO: ensure scanner errors are reported properly (i.e. test
+;; unterminated string behavior)

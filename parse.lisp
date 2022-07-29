@@ -37,7 +37,7 @@
 		       (var-declaration)
 		       (statement))
 		 (lox-parse-error ()
-		   (advance)
+		   (synchronize)
 		   nil)))
 
 	     (var-declaration ()
@@ -125,14 +125,15 @@
 						"Expect expression.")))))
 
 	     (match (&rest token-types)
-	       (and (some (function check) token-types)
-		    (progn (advance) t)))
+	       (when (some (function check) token-types)
+		 (advance)
+		 t))
 
 	     (check (tok-type)
 	       (and (not (at-end?)) (equals (token-type (peek)) tok-type)))
+
 	     (advance ()
-	       (when (not (at-end?))
-		 (incf current))
+	       (unless (at-end?) (incf current))
 	       (previous))
 
 	     (consume (tok-type error-message)
@@ -144,5 +145,23 @@
 
 	     (peek () (aref tokens current))
 
-	     (previous () (aref tokens (1- current))))
+	     (previous () (aref tokens (1- current)))
+
+	     (synchronize ()
+	       (advance)
+	       (loop while (not (at-end?))
+		     do
+			(when (eq (token-type (previous)) 'semicolon)
+			  (return-from synchronize))
+			(when (member (token-type (peek))
+				      '(cl-lox/tokens:class
+					cl-lox/tokens:fun
+					cl-lox/tokens:var
+					cl-lox/tokens:for
+					cl-lox/tokens:if
+					cl-lox/tokens:while
+					cl-lox/tokens:print
+					cl-lox/tokens:return))
+			  (return-from synchronize))
+			(advance))))
       (loop until (at-end?) collect (declaration)))))

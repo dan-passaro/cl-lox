@@ -1,6 +1,7 @@
 (defpackage :cl-lox/report-error
   (:documentation "Error reporting functionality.")
   (:export
+   :*had-error*
    :lox-error
    :report-error)
 
@@ -8,6 +9,8 @@
 (in-package :cl-lox/report-error)
 
 (defgeneric lox-error (place message))
+
+(defparameter *had-error* nil)
 
 (defmethod lox-error ((line integer) message)
   (report-error line "" message))
@@ -21,4 +24,4 @@
 
 (defun report-error (line where message)
   (format *error-output* "[line ~a] Error~a: ~a~%" line where message)
-  (unless t (warn "set hadError here")))
+  (setf *had-error* t))
