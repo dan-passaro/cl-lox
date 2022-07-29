@@ -77,6 +77,18 @@
 		   (stdout result)))
       (is (string= "" (stderr result))))))
 
+(test run-prompt-continues-after-error
+  (with-input-from-string (*standard-input*
+			   (join-lines
+			    "print 1;"
+			    "print +;"
+			    "print 2;"))
+    (let ((result (capture-result 'cl-lox:run-prompt)))
+      (is (string= (format nil "> 1~%> > 2~%> ")
+		   (stdout result)))
+      (is (string= (join-lines "[line 1] Error at '+': Expect expression.")
+		   (stderr result))))))
+
 (test scans-numbers
   (is (equals (list (make-token 'cl-lox/tokens:number "3" 3.0 1)
 		    (make-token 'cl-lox/tokens:plus "+" nil 1)
