@@ -208,3 +208,5 @@ print a + b;
 		 (stderr result)))))
 
 ;; TODO: ensure all binary operators typecheck appropriately
+
+;; TODO: test prompt recovers from errors when printing expr
