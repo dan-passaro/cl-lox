@@ -97,6 +97,11 @@
     (is (string= (join-lines "[line 1] Error at '+': Expect expression.")
 		 (stderr result)))))
 
+(test run-prompt-allows-expressions-without-semicolon
+  (let ((result (run-prompt-and-capture "4 + 5")))
+    (is (string= (format nil "> 9~%> ") (stdout result)))
+    (is (string= "" (stderr result)))))
+
 (test scans-numbers
   (is (equals (list (make-token 'cl-lox/tokens:number "3" 3.0 1)
 		    (make-token 'cl-lox/tokens:plus "+" nil 1)
@@ -188,10 +193,6 @@ print a + b;
   (let ((result (run-and-capture "print !true;")))
     (is (string= (join-lines "false") (stdout result)))
     (is (string= "" (stderr result)))))
-
-;; TODO: allow prompt code to omit semicolon, and if it's an expr with
-;; no semicolon, always print the result. E.g. "> 3+4" at the prompt
-;; should result in "7" on the next line, not an error message.
 
 ;; TODO: ensure scanner errors are reported properly (i.e. test
 ;; unterminated string behavior)

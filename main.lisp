@@ -2,9 +2,11 @@
   (:nicknames :cl-lox)
   (:use :cl)
   (:import-from :cl-lox/environment :make-environment)
-  (:import-from :cl-lox/interpret :interpret)
+  (:import-from :cl-lox/evaluate :evaluate)
+  (:import-from :cl-lox/interpret :interpret :stringify)
   (:import-from :cl-lox/parse :parse)
   (:import-from :cl-lox/scan :scan-tokens)
+  (:import-from :cl-lox/stmt :expression-stmt-expression)
   (:import-from :cl-lox/token :make-token)
   (:import-from :cl-lox/report-error :*had-error*)
   (:import-from :cl-lox/print-lox-ast :print-lox-ast)
@@ -17,8 +19,7 @@
     (unless *had-error* (interpret code-ast environment))))
 
 (defun println (text)
-  (format t text)
-  (princ #\Newline))
+  (format t "~a~%" text))
 
 (defun run-file (path)
   "Open the Lox script at PATH and execute it."
@@ -34,9 +35,19 @@
       (finish-output)
 
       (let* ((line (read-line *standard-input* nil))
-	     (line-empty (or (not line) (string= line ""))))
+	     (line-empty (or (not line) (string= (str:trim line) ""))))
 	(when line-empty (return-from run-prompt))
-	(run line lox-environment)))))
+	(if (str:ends-with? ";" line)
+
+	    (run line lox-environment)
+
+	    ;; allow running an expression with no semicolon and
+	    ;; printing the result
+	    (let* ((expr-stmt-str (format nil "~a;" line))
+		   (expr-stmt (first (parse (scan-tokens expr-stmt-str))))
+		   (result (evaluate (expression-stmt-expression expr-stmt)
+				     lox-environment)))
+	      (println (stringify result))))))))
 
 (defun main ()
   "Toplevel entry point for a cl-lox binary."

@@ -1,6 +1,7 @@
 (defpackage :cl-lox/interpret
   (:export :interpret
-	   :had-runtime-error)
+   :had-runtime-error
+	   :stringify)
 
   (:use :cl :cl-lox/stmt)
   (:import-from :str)
